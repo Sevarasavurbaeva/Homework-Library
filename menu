@@ -1,0 +1,172 @@
+import java.util.*
+
+
+abstract class LibraryItem(
+    val id: Int,
+    val name: String,
+    var available: Boolean = true
+) {
+    
+    open fun shortInfo(): String {
+        return "$name доступна: ${if (available) "Да" else "Нет"}"
+    }
+
+    
+    abstract fun detailedInfo(): String
+}
+
+
+class Book(
+    id: Int,
+    name: String,
+    val pages: Int,
+    val author: String,
+    available: Boolean = true
+) : LibraryItem(id, name, available) {
+
+    override fun detailedInfo(): String {
+        return "книга: $name ($pages стр.) автора: $author с id: $id доступна: ${if (available) "Да" else "Нет"}"
+    }
+}
+
+
+class Newspaper(
+    id: Int,
+    name: String,
+    val issueNumber: Int,
+    available: Boolean = true
+) : LibraryItem(id, name, available) {
+
+    override fun detailedInfo(): String {
+        return "выпуск: $issueNumber газеты $name с id: $id доступен: ${if (available) "Да" else "Нет"}"
+    }
+}
+
+// Класс для дисков
+class Disc(
+    id: Int,
+    name: String,
+    val discType: String,
+    available: Boolean = true
+) : LibraryItem(id, name, available) {
+
+    override fun detailedInfo(): String {
+        return "$discType $name доступен: ${if (available) "Да" else "Нет"}"
+    }
+}
+
+// Отображение меню
+fun showMainMenu() {
+    println("1. Показать книги")
+    println("2. Показать газеты")
+    println("3. Показать диски")
+    println("4. Выход")
+}
+
+//отображение меню действий с объектом
+fun showItemMenu(item: LibraryItem) {
+    while (true) {
+        println("\n1. Взять домой")
+        println("2. Читать в читальном зале")
+        println("3. Показать подробную информацию")
+        println("4. Вернуть")
+        println("5. Назад к выбору типа объекта")
+        print("Выберите действие: ")
+        when (readlnOrNull()?.toIntOrNull()) {
+            1 -> {
+                if (item is Newspaper) {
+                    println("Газеты нельзя взять домой.")
+                } else if (!item.available) {
+                    println("Этот объект уже взят.")
+                } else {
+                    item.available = false
+                    println("${item::class.simpleName} ${item.id} взяли домой.")
+                }
+            }
+            2 -> {
+                if (item is Disc) {
+                    println("Диски нельзя читать в читальном зале.")
+                } else if (!item.available) {
+                    println("Этот объект уже взят.")
+                } else {
+                    item.available = false
+                    println("${item::class.simpleName} ${item.id} взяли в читальный зал.")
+                }
+            }
+            3 -> println(item.detailedInfo())
+            4 -> {
+                if (item.available) {
+                    println("Этот объект уже доступен.")
+                } else {
+                    item.available = true
+                    println("${item::class.simpleName} ${item.id} вернули.")
+                }
+            }
+            5 -> break
+            else -> println("Неверный выбор.")
+        }
+    }
+}
+
+// Список обьектов
+fun showItems(items: List<LibraryItem>) {
+    items.forEachIndexed { index, item ->
+        println("${index + 1}. ${item.shortInfo()}")
+    }
+}
+
+fun main() {
+    // Пример
+    val books = listOf(
+        Book(1, "Маугли", 202, "Джозеф Киплинг"),
+        Book(2, "1984", 328, "Джордж Оруэлл")
+    )
+    val newspapers = listOf(
+        Newspaper(3, "Сельская жизнь", 794),
+        Newspaper(4, "Комсомольская правда", 123)
+    )
+    val discs = listOf(
+        Disc(5, "Дэдпул и Росомаха", "DVD"),
+        Disc(6, "Интерстеллар", "Blu-ray")
+    )
+
+    val scanner = Scanner(System.`in`)
+    while (true) {
+        showMainMenu()
+        print("Выберите тип объекта: ")
+        when (scanner.nextInt()) {
+            1 -> {
+                showItems(books)
+                print("Выберите книгу: ")
+                val choice = scanner.nextInt() - 1
+                if (choice in books.indices) {
+                    showItemMenu(books[choice])
+                } else {
+                    println("Неверный выбор.")
+                }
+            }
+            2 -> {
+                showItems(newspapers)
+                print("Выберите газету: ")
+                val choice = scanner.nextInt() - 1
+                if (choice in newspapers.indices) {
+                    showItemMenu(newspapers[choice])
+                } else {
+                    println("Неверный выбор.")
+                }
+            }
+            3 -> {
+                showItems(discs)
+                print("Выберите диск: ")
+                val choice = scanner.nextInt() - 1
+                if (choice in discs.indices) {
+                    showItemMenu(discs[choice])
+                } else {
+                    println("Неверный выбор.")
+                }
+            }
+            4 -> return
+            else -> println("Неверный выбор.")
+        }
+    }
+}

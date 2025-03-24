@@ -1,0 +1,78 @@
+enum class Month(val month: String) {
+    ЯНВАРЬ("Январь"),
+    ФЕВРАЛЬ("Февраль"),
+    МАРТ("Март"),
+    АПРЕЛЬ("Апрель"),
+    МАЙ("Май"),
+    ИЮНЬ("Июнь"),
+    ИЮЛЬ("Июль"),
+    АВГУСТ("Август"),
+    СЕНТЯБРЬ("Сентябрь"),
+    ОКТЯБРЬ("Октябрь"),
+    НОЯБРЬ("Ноябрь"),
+    ДЕКАБРЬ("Декабрь")
+
+interface Store<T> {
+    fun sell(): T
+}
+
+data class Book(val title: String, val author: String)
+data class Disk(val title: String, val artist: String)
+data class Newspaper(val title: String, val month: Month)
+
+class BookStore : Store<Book> {
+    override fun sell(): Book {
+        return Book("Название книги", "Автор книги")
+    }
+}
+
+class DiskStore : Store<Disk> {
+    override fun sell(): Disk {
+        return Disk("Название диска", "Исполнитель")
+    }
+}
+
+class NewspaperStand : Store<Newspaper> {
+    override fun sell(): Newspaper {
+        return Newspaper("Название газеты", Month.АВГУСТ)
+    }
+}
+
+class Manager {
+    fun <T> buy(store: Store<T>): T {
+        return store.sell()
+    }
+}
+class DigitalOffice {
+    fun digitize(material: Any): String {
+        return when (material) {
+            is Book -> "Книга '${material.title}' оцифрована на CD"
+            is Newspaper -> "Газета '${material.title}' оцифрована на CD"
+            else -> throw IllegalArgumentException("Неверный тип материала")
+        }
+    }
+}
+inline fun <reified T> List<Any>.filterByType(): List<T> {
+    return this.filterIsInstance<T>()
+}
+fun main() {
+    val manager = Manager()
+    val bookStore = BookStore()
+    val diskStore = DiskStore()
+    val newspaperStand = NewspaperStand()
+    val digitalOffice = DigitalOffi
+
+val book = manager.buy(bookStore)
+  println("Куплена книга: ${book.title}, ${book.author}")
+
+println(digitalOffice.digitize(book))
+
+val newspaper = manager.buy(newspaperStand)
+    println("Куплена газета: ${newspaper.title}, ${newspaper.month.month}")
+
+ println(digitalOffice.digitize(newspaper))
+
+val items: List<Any> = listOf(book, newspaper, diskStore.sell())
+    val booksFromList: List<Book> = items.filterByType()
+    println("Найденные книги: ${booksFromList.map { it.title }}")
+}
